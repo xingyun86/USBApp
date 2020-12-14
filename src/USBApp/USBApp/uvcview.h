@@ -298,6 +298,126 @@ typedef struct _USBHOSTCONTROLLERINFO
     PUSB_DEVICE_PNP_STRINGS             UsbDeviceProperties;
 } USBHOSTCONTROLLERINFO, *PUSBHOSTCONTROLLERINFO;
 
+#if (NTDDI_VERSION < NTDDI_WIN8)
+typedef enum _USB_HUB_TYPE {
+    UsbRootHub = 1,
+    Usb20Hub = 2,
+    Usb30Hub = 3
+} USB_HUB_TYPE;
+
+
+typedef struct _USB_HUB_INFORMATION_EX {
+    USB_HUB_TYPE             HubType;
+
+    // The higest valid port number on the hub
+    USHORT   HighestPortNumber;
+
+    union {
+        USB_HUB_DESCRIPTOR  UsbHubDescriptor;
+        USB_30_HUB_DESCRIPTOR  Usb30HubDescriptor;
+    } u;
+
+} USB_HUB_INFORMATION_EX, * PUSB_HUB_INFORMATION_EX;
+
+typedef union _USB_PORT_PROPERTIES {
+    ULONG  ul;
+
+    struct {
+        ULONG PortIsUserConnectable : 1;
+        ULONG PortIsDebugCapable : 1;
+        ULONG PortHasMultipleCompanions : 1;
+        ULONG PortConnectorIsTypeC : 1;
+        ULONG ReservedMBZ : 28;
+    };
+
+} USB_PORT_PROPERTIES, * PUSB_PORT_PROPERTIES;
+
+typedef struct _USB_PORT_CONNECTOR_PROPERTIES {
+    // one based port number
+    ULONG  ConnectionIndex;
+
+    // The number of bytes required to hold the entire USB_PORT_CONNECTOR_PROPERTIES
+    // structure, including the full CompanionHubSymbolicLinkName string
+    ULONG  ActualLength;
+
+    // bitmask of flags indicating properties and capabilities of the port
+    USB_PORT_PROPERTIES  UsbPortProperties;
+
+    // Zero based index number of the companion port being queried.
+    USHORT                CompanionIndex;
+
+    // Port number of the companion port
+    USHORT                CompanionPortNumber;
+
+    // Symbolic link name for the companion hub
+    WCHAR                 CompanionHubSymbolicLinkName[1];
+} USB_PORT_CONNECTOR_PROPERTIES, * PUSB_PORT_CONNECTOR_PROPERTIES;
+
+#if (NTDDI_VERSION < NTDDI_VISTA)
+typedef union _USB_HUB_CAP_FLAGS {
+    ULONG ul;
+    struct {
+        ULONG HubIsHighSpeedCapable : 1;
+        ULONG HubIsHighSpeed : 1;
+        ULONG HubIsMultiTtCapable : 1;
+        ULONG HubIsMultiTt : 1;
+        ULONG HubIsRoot : 1;
+        ULONG HubIsArmedWakeOnConnect : 1;
+        ULONG HubIsBusPowered : 1;
+        ULONG ReservedMBZ : 25;
+    };
+
+} USB_HUB_CAP_FLAGS, * PUSB_HUB_CAP_FLAGS;
+
+C_ASSERT(sizeof(USB_HUB_CAP_FLAGS) == sizeof(ULONG));
+
+typedef struct _USB_HUB_CAPABILITIES_EX {
+
+    USB_HUB_CAP_FLAGS CapabilityFlags;
+
+} USB_HUB_CAPABILITIES_EX, * PUSB_HUB_CAPABILITIES_EX;
+#endif
+typedef union _USB_PROTOCOLS {
+    ULONG  ul;
+
+    struct {
+        ULONG Usb110 : 1;
+        ULONG Usb200 : 1;
+        ULONG Usb300 : 1;
+        ULONG ReservedMBZ : 29;
+    };
+
+} USB_PROTOCOLS, * PUSB_PROTOCOLS;
+
+typedef union _USB_NODE_CONNECTION_INFORMATION_EX_V2_FLAGS {
+    ULONG  ul;
+
+    struct {
+        ULONG DeviceIsOperatingAtSuperSpeedOrHigher : 1;
+        ULONG DeviceIsSuperSpeedCapableOrHigher : 1;
+        ULONG DeviceIsOperatingAtSuperSpeedPlusOrHigher : 1;
+        ULONG DeviceIsSuperSpeedPlusCapableOrHigher : 1;
+        ULONG ReservedMBZ : 28;
+    };
+
+} USB_NODE_CONNECTION_INFORMATION_EX_V2_FLAGS, * PUSB_NODE_CONNECTION_INFORMATION_EX_V2_FLAGS;
+
+typedef struct _USB_NODE_CONNECTION_INFORMATION_EX_V2 {
+    // one based port number
+    ULONG  ConnectionIndex;
+
+    // length of the structure
+    ULONG  Length;
+
+    // On input a bitmask that indicates which USB protocols are understood by the caller
+    // On output a bitmask that indicates which USB signaling protocols are supported by the port
+    USB_PROTOCOLS SupportedUsbProtocols;
+
+    // A bitmask indicating properties of the connected device or port
+    USB_NODE_CONNECTION_INFORMATION_EX_V2_FLAGS Flags;
+} USB_NODE_CONNECTION_INFORMATION_EX_V2, * PUSB_NODE_CONNECTION_INFORMATION_EX_V2;
+
+#endif
 typedef struct _USBROOTHUBINFO
 {
     USBDEVICEINFOTYPE                   DeviceInfoType;

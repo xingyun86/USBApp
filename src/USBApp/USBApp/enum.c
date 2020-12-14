@@ -601,7 +601,37 @@ EnumerateHostController (
 
     return;
 }
+#if (NTDDI_VERSION < NTDDI_WIN8)
+#define IOCTL_USB_RESET_HUB  \
+            CTL_CODE(FILE_DEVICE_USB,  \
+                    USB_RESET_HUB,\
+                    METHOD_BUFFERED,  \
+                    FILE_ANY_ACCESS)
 
+#define IOCTL_USB_GET_HUB_CAPABILITIES_EX  \
+                                CTL_CODE(FILE_DEVICE_USB,  \
+                                    USB_GET_HUB_CAPABILITIES_EX,  \
+                                    METHOD_BUFFERED,  \
+                                    FILE_ANY_ACCESS)
+
+#define IOCTL_USB_GET_HUB_INFORMATION_EX  \
+                                CTL_CODE(FILE_DEVICE_USB,  \
+                                   USB_GET_HUB_INFORMATION_EX,\
+                                   METHOD_BUFFERED,  \
+                                   FILE_ANY_ACCESS)
+
+#define IOCTL_USB_GET_PORT_CONNECTOR_PROPERTIES  \
+                                CTL_CODE(FILE_DEVICE_USB,  \
+                                    USB_GET_PORT_CONNECTOR_PROPERTIES,  \
+                                    METHOD_BUFFERED,  \
+                                    FILE_ANY_ACCESS)
+
+#define IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2  \
+                                CTL_CODE(FILE_DEVICE_USB,  \
+                                    USB_GET_NODE_CONNECTION_INFORMATION_EX_V2,  \
+                                    METHOD_BUFFERED,  \
+                                    FILE_ANY_ACCESS)
+#endif
 
 //*****************************************************************************
 //
